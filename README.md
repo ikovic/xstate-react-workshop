@@ -1,5 +1,7 @@
 # React Finland Statecharts Workshop
 
+https://slides.com/davidkhourshid/deck-49-52#/
+
 Statecharts are a powerful, well-established formalism that describe even the most complex application behavior and logic in a visual, hierarchical, and deterministic way. In this workshop you will learn about finite state machines and statecharts, and apply them to real-life React applications in ways that will increase productivity and eliminate entire classes of possible bugs from your code. You will also learn how to:
 
 - Refactor React applications of any size to use statecharts, piece by piece
