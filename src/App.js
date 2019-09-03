@@ -1,4 +1,7 @@
-import React from 'react';
+import React from "react";
+import { useMachine } from "@xstate/react";
+
+import feedbackMachine from "./feedbackMachine";
 
 function Screen({ children, onSubmit = undefined }) {
   if (onSubmit) {
@@ -44,7 +47,7 @@ function FormScreen({ onSubmit, onClose }) {
         name="response"
         placeholder="Complain here"
         onKeyDown={e => {
-          if (e.key === 'Escape') {
+          if (e.key === "Escape") {
             e.stopPropagation();
           }
         }}
@@ -64,52 +67,54 @@ function ThanksScreen({ onClose }) {
   );
 }
 
-function feedbackReducer(state, event) {
-  switch (state) {
-    case 'question':
-      switch (event.type) {
-        case 'GOOD':
-          return 'thanks';
-        case 'BAD':
-          return 'form';
-        case 'CLOSE':
-          return 'closed';
-        default:
-          return state;
-      }
-    case 'form':
-      switch (event.type) {
-        case 'SUBMIT':
-          return 'thanks';
-        case 'CLOSE':
-          return 'closed';
-        default:
-          return state;
-      }
-    case 'thanks':
-      switch (event.type) {
-        case 'CLOSE':
-          return 'closed';
-        default:
-          return state;
-      }
-    default:
-      return state;
-  }
-}
-
 export function Feedback() {
-  return (
-    <>
+  const [current, send] = useMachine(feedbackMachine);
+
+  console.log(current);
+
+  if (current.matches("question")) {
+    return (
       <QuestionScreen
-        onClickGood={() => {}}
-        onClickBad={() => {}}
-        onClose={() => {}}
+        onClickGood={() => {
+          send("GOOD");
+        }}
+        onClickBad={() => {
+          send("BAD");
+        }}
+        onClose={() => {
+          send("CLOSE");
+        }}
       />
-      <FormScreen onSubmit={value => {}} onClose={() => {}} />
-      <ThanksScreen onClose={() => {}} />
-    </>
-  );
+    );
+  }
+
+  if (current.matches("form")) {
+    return (
+      <FormScreen
+        onSubmit={value => {
+          send({
+            type: "SUBMIT",
+            value
+          });
+        }}
+        onClose={() => {
+          send("CLOSE");
+        }}
+      />
+    );
+  }
+
+  if (current.matches("thanks")) {
+    return (
+      <ThanksScreen
+        onClose={() => {
+          send("CLOSE");
+        }}
+      />
+    );
+  }
+
+  return null;
 }
 
 export function App() {
